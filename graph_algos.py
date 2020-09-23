@@ -86,7 +86,9 @@ class node2vec:
             else:
                 unnormalised_probs.append(G[dst][dst_nbr]['weight']/q)
         norm_const = sum(unnormalised_probs)
-        return unnormalised_probs
+        normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalised_probs]
+        
+        return alias_setup(normalized_probs)
     
     def read_graph(self,args):
         '''
