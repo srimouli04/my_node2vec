@@ -8,7 +8,7 @@ from gensim.models import Word2Vec
 ''' This module concentrates on building the second order Random walks needed for Node2vec alogorithm to work'''
 '''This Class describes the Node2vec implementation'''
 class node2vec:
-    def __init__(self,G,p,q):
+    def __init__(self,args):
         '''
         Paramters
         g - graph object
@@ -17,14 +17,16 @@ class node2vec:
         num_walks - number of walks
         walk_length - Walk length
         '''
-        self.G = G
+        self.args = args
+        self.G = args.G
         self.nodes = nx.nodes
+        self.is_directed = args.is_directed
         print('Edge weightining \n')
         for edge in tqdm(self.G.edges()):
             self.G[edge[0]][edge[1]]['weight'] = 1.0
             self.G[edge[1]][edge[0]]['weight'] = 1.0
-        self.p = p
-        self.q = q
+        self.p = args.p
+        self.q = args.q
         #self.prep_trans_prob()
         #self.simulatewalks()
         
@@ -86,7 +88,22 @@ class node2vec:
         norm_const = sum(unnormalised_probs)
         return unnormalised_probs
     
-        
+    def read_graph(self,args):
+        '''
+	    Reads the input network in networkx.
+	    '''
+        if args.weighted:
+            G = nx.read_edgelist(args.input, nodetype=int, data=(('weight',float),), create_using=nx.DiGraph())
+        else:
+            G = nx.read_edgelist(args.input, nodetype=int, create_using=nx.DiGraph())
+            for edge in G.edges():
+                G[edge[0]][edge[1]]['weight'] = 1
+
+        if not args.directed:
+            G = G.to_undirected()
+
+        return G
+    
     def generate_node2vec_embeddings(self,walks,args):
         self.walks = walks
         walks = [map(str,walk) for walk in walks]
