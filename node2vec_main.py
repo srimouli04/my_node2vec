@@ -1,4 +1,4 @@
-from parser import parm_parser
+from node2vec_parser import parm_parser
 from graph_algos import node2vec
 
 #main function where all intialization and triggering happens 
