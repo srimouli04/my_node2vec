@@ -27,8 +27,8 @@ class node2vec:
             self.G[edge[1]][edge[0]]['weight'] = 1.0
         self.p = args.p
         self.q = args.q
-        #self.prep_trans_prob()
-        #self.simulatewalks()
+        self.prep_trans_prob()
+        self.simulatewalks()
         
     def node2vecwalk(self,walk_length,start_node):
         '''As part of this function we are trying to generate random walks given a node
