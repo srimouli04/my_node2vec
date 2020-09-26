@@ -2,7 +2,7 @@ import argparse
 
 ''' This module is used to parse the inputs for program'''
 
-def parm_parser():
+def nd2vec_parser():
 
 	parser = argparse.ArgumentParser(description="Run node2vec.")
 

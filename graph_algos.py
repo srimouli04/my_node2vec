@@ -2,13 +2,13 @@ import numpy as np
 import random
 from tqdm import tqdm
 import networkx as nx
-from utilities import read_graph
+from utilities import alias_setup,alias_draw
 from gensim.models import Word2Vec 
 
 ''' This module concentrates on building the second order Random walks needed for Node2vec alogorithm to work'''
 '''This Class describes the Node2vec implementation'''
-class node2vec:
-    def __init__(self,args):
+class nd2vec:
+    def __init__(self,args,G):
         '''
         Paramters
         g - graph object
@@ -17,20 +17,15 @@ class node2vec:
         num_walks - number of walks
         walk_length - Walk length
         '''
+        
+        self.G = G
         self.args = args
-        self.G = args.G
-        self.nodes = nx.nodes
-        self.is_directed = args.is_directed
-        print('Edge weightining \n')
-        for edge in tqdm(self.G.edges()):
-            self.G[edge[0]][edge[1]]['weight'] = 1.0
-            self.G[edge[1]][edge[0]]['weight'] = 1.0
+        self.is_directed = args.directed
         self.p = args.p
         self.q = args.q
-        self.prep_trans_prob()
-        self.simulatewalks()
         
-    def node2vecwalk(self,walk_length,start_node):
+        
+    def nd2vec_wk(self,walk_length,start_node):
         '''As part of this function we are trying to generate random walks given a node
         we'll be using alias sampling here inorder to improve the efficiency of algorithm to 
         when calculating the transitional probabilities to be O(1), I will explain it in detail 
@@ -65,10 +60,10 @@ class node2vec:
             random.shuffle(nodes)
             print(str(walk_iter+1)), '/',str(num_walks)
             for node in tqdm(nodes):
-                walks.append(self.node2vecwalk(walk_length=walk_length,start_node=node))
+                walks.append(self.nd2vec_wk(walk_length=walk_length,start_node=node))
         return walks
         
-    def get_alias_edge(self,src,dst):
+    def get_alias_edge(self,src,dest):
         '''
         Get alias edge  for a given edge
         '''
@@ -78,40 +73,25 @@ class node2vec:
         q=self.q
         
         unnormalised_probs = []
-        for dst_nbr in sorted(G.neighbors(dst)):
-            if dst_nbr == src:
-                unnormalised_probs.append(G[dst][dst_nbr]['weight']/p)
-            elif G.has_edge(dst_nbr,src):
-                unnormalised_probs.append(G[dst][dst_nbr]['weight'])
+        for dest_nbr in sorted(G.neighbors(dest)):
+            if dest_nbr == src:
+                unnormalised_probs.append(G[dest][dest_nbr]['weight']/p)
+            elif G.has_edge(dest_nbr,src):
+                unnormalised_probs.append(G[dest][dest_nbr]['weight'])
             else:
-                unnormalised_probs.append(G[dst][dst_nbr]['weight']/q)
+                unnormalised_probs.append(G[dest][dest_nbr]['weight']/q)
         norm_const = sum(unnormalised_probs)
         normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalised_probs]
         
         return alias_setup(normalized_probs)
-    
-    def read_graph(self,args):
-        '''
-	    Reads the input network in networkx.
-	    '''
-        if args.weighted:
-            G = nx.read_edgelist(args.input, nodetype=int, data=(('weight',float),), create_using=nx.DiGraph())
-        else:
-            G = nx.read_edgelist(args.input, nodetype=int, create_using=nx.DiGraph())
-            for edge in G.edges():
-                G[edge[0]][edge[1]]['weight'] = 1
 
-        if not args.directed:
-            G = G.to_undirected()
-
-        return G
     
-    def generate_node2vec_embeddings(self,walks,args):
-        self.walks = walks
+    def generate_nd2vec_embeddings(self,walks):
+        
         walks = [map(str,walk) for walk in walks]
-        model = Word2Vec(walks,size=args.dimensions,window=args.window_size,min_count=0,sg=1,workers=args.workes
-                     ,iter = args.iter)
-        model.save_word2vec_format(args.output)
+        model = Word2Vec(walks,size=self.args.dimensions,window=self.args.window_size,min_count=0,sg=1,workers=self.args.workes
+                     ,iter = self.args.iter)
+        model.save_word2vec_format(self.args.output)
         return 
 
     def prep_trans_prob(self):
@@ -134,53 +114,14 @@ class node2vec:
         
         if is_directed:
             for edge in G.edges():
-                alias_edge[edge] = self.get_alias_edge(edge[0],edge[1])
+                alias_edges[edge] = self.get_alias_edge(edge[0],edge[1])
         else:
             for edge in G.edges():
-                alias_edge[edge] = self.get_alias_edge(edge[0],edge[1])
-                alias_edge[(edge[1],edge[0])] = self.get_alias_edge(edge[1],edge[0])     
+                alias_edges[edge] = self.get_alias_edge(edge[0],edge[1])
+                alias_edges[(edge[1],edge[0])] = self.get_alias_edge(edge[1],edge[0])     
                 
         self.alias_nodes = alias_nodes
         self.alias_edges = alias_edges
         
         return
-    
-    def alias_setup(self,probs):
-        
-        K = len(probs)
-        q = np.zeros(K)
-        J = np.zeros(K, dtype=np.int)
 
-        smaller = []
-        larger = []
-        for kk, prob in enumerate(probs):
-            q[kk] = K*prob
-            if q[kk] < 1.0:
-                smaller.append(kk)
-            else:
-                larger.append(kk)
-
-        while len(smaller) > 0 and len(larger) > 0:
-            small = smaller.pop()
-            large = larger.pop()
-
-            J[small] = large
-            q[large] = q[large] + q[small] - 1.0
-            if q[large] < 1.0:
-                smaller.append(large)
-            else:
-                larger.append(large)
-
-        return J, q
-
-    def alias_draw(self,J, q):
-        '''
-        Draw sample from a non-uniform discrete distribution using alias sampling.
-        '''
-        K = len(J)
-
-        kk = int(np.floor(np.random.rand()*K))
-        if np.random.rand() < q[kk]:
-            return kk
-        else:
-            return J[kk]   
