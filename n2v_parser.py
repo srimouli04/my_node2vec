@@ -9,7 +9,7 @@ def nd2vec_parser():
 	parser.add_argument('--input', nargs='?', default='input/karate.edgelist',
 	                    help='Input graph path')
 
-	parser.add_argument('--output', nargs='?', default='embeddings/karate.emb',
+	parser.add_argument('--output', nargs='?', default='output/karate.emb',
 	                    help='Embeddings path')
 
 	parser.add_argument('--dimensions', type=int, default=128,

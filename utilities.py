@@ -14,7 +14,7 @@ def read_graph(input_file,is_weighted,is_directed):
             Graph_obj[edge[0]][edge[1]]['weight'] = 1.0
     
     if not is_directed:
-        Graph_obj = Graph_obj.to_unis_directed()
+        Graph_obj = Graph_obj.to_directed()
     
     return Graph_obj
     

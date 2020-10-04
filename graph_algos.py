@@ -11,11 +11,8 @@ class nd2vec:
     def __init__(self,args,G):
         '''
         Paramters
-        g - graph object
-        p - Parameter controlling BFS
-        q - Parameter controlling DFS
-        num_walks - number of walks
-        walk_length - Walk length
+        args - all the arguments 
+        G - Graph object
         '''
         
         self.G = G
@@ -23,7 +20,7 @@ class nd2vec:
         self.is_directed = args.directed
         self.p = args.p
         self.q = args.q
-        
+        self.workers = args.workers
         
     def nd2vec_wk(self,walk_length,start_node):
         '''As part of this function we are trying to generate random walks given a node
@@ -39,7 +36,7 @@ class nd2vec:
         
         while len(walk) < walk_length:
             cur = walk[-1]
-            cur_nbrs = sorted(G.neighbours(cur))
+            cur_nbrs = sorted(G.neighbors(cur))
             if len(cur_nbrs) > 0:
                 if len(walk) == 1:
                     walk.append(cur_nbrs[alias_draw(alias_nodes[cur][0],alias_nodes[cur][1])])
@@ -88,8 +85,8 @@ class nd2vec:
     
     def generate_nd2vec_embeddings(self,walks):
         
-        walks = [map(str,walk) for walk in walks]
-        model = Word2Vec(walks,size=self.args.dimensions,window=self.args.window_size,min_count=0,sg=1,workers=self.args.workes
+        walks = list(map(str,walk) for walk in walks)
+        model = Word2Vec(walks,size=self.args.dimensions,window=self.args.window_size,min_count=0,sg=1,workers=self.args.workers
                      ,iter = self.args.iter)
         model.save_word2vec_format(self.args.output)
         return 
@@ -124,4 +121,5 @@ class nd2vec:
         self.alias_edges = alias_edges
         
         return
+
 
