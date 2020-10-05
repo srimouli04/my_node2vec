@@ -7,6 +7,7 @@ def nd2vec_main(args):
     '''
 	Pipeline for representational learning for all nodes in a graph.
 	'''
+    tab_printer(args)
     parsed_input_graph  = read_graph(args.input,args.weighted,args.directed)
     graph_nodes = nd2vec(args,parsed_input_graph)
     graph_nodes.prep_trans_prob()
@@ -18,4 +19,3 @@ def nd2vec_main(args):
 if __name__ == "__main__":
 	args = nd2vec_parser()
 	nd2vec_main(args)
-    tab_printer(args)

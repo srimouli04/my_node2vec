@@ -52,11 +52,11 @@ class nd2vec:
         G = self.G
         walks = []
         nodes = list(G.nodes())
-        print('walk-iteration')
+        print('\n walk-iteration \n')
         for walk_iter in tqdm(range(num_walks)):
             random.shuffle(nodes)
-            print(str(walk_iter+1)), '/',str(num_walks)
-            for node in tqdm(nodes):
+            #print(str(walk_iter+1)), '/',str(num_walks)
+            for node in nodes:
                 walks.append(self.nd2vec_wk(walk_length=walk_length,start_node=node))
         return walks
         

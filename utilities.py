@@ -12,7 +12,7 @@ def read_graph(input_file,is_weighted,is_directed):
         Graph_obj = nx.read_edgelist(input_file, nodetype=int, data=(('weight',float),),create_using=nx.DiGraph())
     else:
         Graph_obj = nx.read_edgelist(input_file,nodetype=int,create_using=nx.DiGraph())
-        print('Edge weighting \n')
+        print('\n Edge weighting \n')
         for edge in tqdm(Graph_obj.edges()):
             Graph_obj[edge[0]][edge[1]]['weight'] = 1.0
     
@@ -66,6 +66,7 @@ def alias_draw(J, q):
     
 def tab_printer(args):
 
+    print('\n Arguments Passed : \n ')
     args = vars(args)
     keys = sorted(args.keys())
     t = Texttable()
