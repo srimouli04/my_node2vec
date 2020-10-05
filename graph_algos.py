@@ -30,7 +30,7 @@ class nd2vec:
         
         G = self.G
         alias_nodes = self.alias_nodes
-        alias_edges = self.alias_edges
+        weighted_edge = self.weighted_edge
         
         walk = [start_node]
         
@@ -42,7 +42,7 @@ class nd2vec:
                     walk.append(cur_nbrs[alias_draw(alias_nodes[cur][0],alias_nodes[cur][1])])
                 else:
                     prev = walk[-2]
-                    next = cur_nbrs[alias_draw(alias_edges[(prev, cur)][0], alias_edges[(prev, cur)][1])]
+                    next = cur_nbrs[alias_draw(weighted_edge[(prev, cur)][0], weighted_edge[(prev, cur)][1])]
                     walk.append(next)
             else:
                 break
@@ -60,7 +60,7 @@ class nd2vec:
                 walks.append(self.nd2vec_wk(walk_length=walk_length,start_node=node))
         return walks
         
-    def get_alias_edge(self,src,dest):
+    def get_weighted_edge(self,src,dest):
         '''
         Get alias edge  for a given edge
         '''
@@ -94,7 +94,7 @@ class nd2vec:
     def prep_trans_prob(self):
         
         '''
-        Calculating the transitional probabilities before hand
+        Calculating the transitional probabilities
         '''
 
         G = self.G
@@ -107,18 +107,18 @@ class nd2vec:
             normalised_probs = [float(u_prob)/norm_const for u_prob in unnormalised_probs]
             alias_nodes[node] = alias_setup(normalised_probs)
             
-        alias_edges = {}
+        weighted_edge = {}
         
         if is_directed:
             for edge in G.edges():
-                alias_edges[edge] = self.get_alias_edge(edge[0],edge[1])
+                weighted_edge[edge] = self.get_weighted_edge(edge[0],edge[1])
         else:
             for edge in G.edges():
-                alias_edges[edge] = self.get_alias_edge(edge[0],edge[1])
-                alias_edges[(edge[1],edge[0])] = self.get_alias_edge(edge[1],edge[0])     
+                weighted_edge[edge] = self.get_weighted_edge(edge[0],edge[1])
+                weighted_edge[(edge[1],edge[0])] = self.get_weighted_edge(edge[1],edge[0])     
                 
         self.alias_nodes = alias_nodes
-        self.alias_edges = alias_edges
+        self.weighted_edge = weighted_edge
         
         return
 
