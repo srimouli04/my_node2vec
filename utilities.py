@@ -1,9 +1,12 @@
 import networkx as nx
 import numpy as np
+from texttable import Texttable
 from tqdm import tqdm
 
+
+
 def read_graph(input_file,is_weighted,is_directed):
-    '''Reads input by default its fifa '''
+    '''It reads the graph and prepares it for further processing. By default karate club graph is read'''
     
     if is_weighted:
         Graph_obj = nx.read_edgelist(input_file, nodetype=int, data=(('weight',float),),create_using=nx.DiGraph())
@@ -19,6 +22,11 @@ def read_graph(input_file,is_weighted,is_directed):
     return Graph_obj
     
 def alias_setup(probs):
+    
+    ''' This is an old but efficient technique to create uniform probability distribution and then we calculate
+        samples based on the uniform distribution. This is not necessary, for smaller graphs, but when the 
+        graph size increases this method is an efficient approach to in deciding the probabilities'''
+        
     K = len(probs)
     q = np.zeros(K)
     J = np.zeros(K, dtype=np.int)
@@ -54,4 +62,13 @@ def alias_draw(J, q):
     if np.random.rand() < q[kk]:
         return kk
     else:
-        return J[kk]         
+        return J[kk]   
+    
+def tab_printer(args):
+
+    args = vars(args)
+    keys = sorted(args.keys())
+    t = Texttable()
+    t.add_rows([["Parameter", "Value"]])
+    t.add_rows([[k.replace("_", " ").capitalize(), args[k]] for k in keys])
+    print(t.draw())          

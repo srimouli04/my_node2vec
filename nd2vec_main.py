@@ -1,9 +1,9 @@
 from graph_algos import nd2vec
 from n2v_parser import nd2vec_parser
-from utilities import read_graph
+from utilities import read_graph,tab_printer
 
 #main function where all intialization and triggering happens 
-def main(args):
+def nd2vec_main(args):
     '''
 	Pipeline for representational learning for all nodes in a graph.
 	'''
@@ -17,4 +17,5 @@ def main(args):
 
 if __name__ == "__main__":
 	args = nd2vec_parser()
-	main(args)
+	nd2vec_main(args)
+    tab_printer(args)
