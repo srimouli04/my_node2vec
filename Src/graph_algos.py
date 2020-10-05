@@ -2,7 +2,7 @@ import numpy as np
 import random
 from tqdm import tqdm
 import networkx as nx
-from utilities import alias_setup,alias_draw
+from Src.utilities import alias_setup,alias_draw
 from gensim.models import Word2Vec 
 
 ''' This module concentrates on building the second order Random walks needed for Node2vec alogorithm to work'''

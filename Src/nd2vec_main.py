@@ -1,6 +1,6 @@
-from graph_algos import nd2vec
-from n2v_parser import nd2vec_parser
-from utilities import read_graph,tab_printer
+from Src.graph_algos import nd2vec
+from Src.n2v_parser import nd2vec_parser
+from Src.utilities import read_graph,tab_printer
 
 #main function where all intialization and triggering happens 
 def nd2vec_main(args):
