@@ -42,7 +42,7 @@ class nd2vec:
                     walk.append(cur_nbrs[alias_draw(alias_nodes[cur][0],alias_nodes[cur][1])])
                 else:
                     prev = walk[-2]
-                    next = cur_nbrs[alias_draw(alias_edges[(prev,cur)[0]],alias_edges[(prev,cur)[1]])]
+                    next = cur_nbrs[alias_draw(alias_edges[(prev, cur)][0], alias_edges[(prev, cur)][1])]
                     walk.append(next)
             else:
                 break
@@ -85,10 +85,10 @@ class nd2vec:
     
     def generate_nd2vec_embeddings(self,walks):
         
-        walks = list(map(str,walk) for walk in walks)
+        walks = list(map(str,(walk for walk in walks)))
         model = Word2Vec(walks,size=self.args.dimensions,window=self.args.window_size,min_count=0,sg=1,workers=self.args.workers
                      ,iter = self.args.iter)
-        model.save_word2vec_format(self.args.output)
+        model.wv.save_word2vec_format(self.args.output)
         return 
 
     def prep_trans_prob(self):
